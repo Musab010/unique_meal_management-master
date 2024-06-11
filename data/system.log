@@ -1,0 +1,111 @@
+2024-06-07 03:39:04,717 - INFO - Failed login attempt 1 for username: musab
+2024-06-07 03:39:16,457 - INFO - Login successful.
+2024-06-07 03:40:38,304 - INFO - SQLite verbinding is succesvol: data/unique_meal.db
+2024-06-07 03:44:23,325 - INFO - Failed login attempt 1 for username: musab
+2024-06-07 03:44:35,442 - INFO - Login successful.
+2024-06-09 00:05:06,227 - INFO - Login successful.
+2024-06-09 00:07:25,150 - INFO - Login successful.
+2024-06-09 18:37:28,734 - INFO - Login successful.
+2024-06-09 18:47:40,608 - INFO - Login successful.
+2024-06-09 18:49:49,580 - INFO - Login successful.
+2024-06-09 18:57:58,490 - INFO - Login successful.
+2024-06-09 19:06:28,866 - INFO - Login successful.
+2024-06-09 19:12:50,586 - INFO - Login successful.
+2024-06-09 19:21:48,279 - INFO - Login successful.
+2024-06-09 19:21:51,258 - ERROR - Unable to decrypt username for row: ('gAAAAABmYi75aMBCxTrmkXv60tUGSEDC7JWcFZlBKVc3nXTTzRH5NMX7FF0C8ZPJFJ1yOi2bj_krrzGbXBckAzKBLOM4qxDBJg==', 'consultant')
+2024-06-09 19:45:20,412 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 19:45:46,471 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 19:52:32,200 - INFO - Login successful.
+2024-06-09 19:52:44,453 - ERROR - Unable to decrypt data for row: ('gAAAAABmZevTKaeqfyP784lz5Witg2RAoSVm4dDIaUeJm9Ng7AX0dZ1BxH5KIwYgKVtsXDWjj1xjBoaVMcnNt2K8TJeEWrfo9w==', 'super_admin', 'Super', 'Admin')
+2024-06-09 19:58:55,118 - INFO - Login successful.
+2024-06-09 19:58:58,502 - ERROR - Unable to decrypt data for row: ('gAAAAABmZe1XbMdWLj1e_u15LJPlLzLN0bhEVIkSG3KLqYWD3sq7nKcWg7YsNsNMoZSGU0-SN8YcAoCGPGCMMHf8EZrKq7tfZA==', 'super_admin', 'Super', 'Admin')
+2024-06-09 19:59:58,635 - INFO - Login successful.
+2024-06-09 20:02:42,177 - ERROR - Fout bij inloggen: 
+2024-06-09 20:02:42,183 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 20:06:07,063 - ERROR - Fout bij inloggen: 
+2024-06-09 20:06:07,068 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 20:06:41,153 - ERROR - Fout bij inloggen: 
+2024-06-09 20:06:41,158 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 20:08:07,957 - ERROR - Fout bij inloggen: 
+2024-06-09 20:08:07,962 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-09 20:08:49,635 - INFO - Login successful.
+2024-06-09 20:09:34,117 - INFO - Login successful.
+2024-06-09 21:38:41,570 - INFO - Login successful.
+2024-06-09 21:39:26,071 - INFO - Login successful.
+2024-06-09 21:47:38,633 - INFO - Failed login attempt 1 for username: s
+2024-06-09 21:47:59,679 - INFO - Login successful.
+2024-06-09 21:48:57,055 - INFO - Login successful.
+2024-06-09 21:52:25,889 - INFO - Login successful.
+2024-06-09 22:00:16,952 - INFO - Login successful.
+2024-06-09 22:01:38,206 - INFO - Login successful.
+2024-06-09 22:08:57,128 - INFO - Login successful.
+2024-06-09 22:13:59,640 - INFO - Login successful.
+2024-06-09 22:15:04,604 - INFO - Failed login attempt 1 for username: MusabConsultant
+2024-06-09 22:15:24,622 - INFO - Login successful.
+2024-06-09 22:55:25,279 - INFO - Login successful.
+2024-06-09 22:57:54,357 - INFO - Login successful.
+2024-06-09 22:59:53,112 - INFO - Login successful.
+2024-06-09 23:03:08,223 - INFO - Login successful.
+2024-06-09 23:09:59,485 - INFO - Login successful.
+2024-06-09 23:16:32,983 - INFO - Login successful.
+2024-06-09 23:39:54,403 - INFO - Login successful.
+2024-06-09 23:59:19,099 - INFO - Login successful.
+2024-06-10 00:04:33,643 - INFO - Login successful.
+2024-06-10 00:05:54,344 - INFO - Login successful.
+2024-06-10 00:08:16,053 - INFO - Failed login attempt 1 for username: mama
+2024-06-10 00:08:22,049 - INFO - Failed login attempt 2 for username: momo
+2024-06-10 00:08:35,172 - INFO - Login successful.
+2024-06-10 00:09:03,396 - INFO - Login successful.
+2024-06-10 00:10:18,505 - INFO - Login successful.
+2024-06-10 00:11:31,480 - INFO - Login successful.
+2024-06-10 00:19:55,232 - INFO - Login successful.
+2024-06-10 00:35:02,214 - INFO - Login successful.
+2024-06-10 00:45:10,853 - INFO - Login successful.
+2024-06-10 00:50:26,161 - INFO - Login successful.
+2024-06-10 00:54:17,825 - INFO - Login successful.
+2024-06-10 00:58:08,567 - INFO - Login successful.
+2024-06-11 20:31:01,113 - INFO - Login successful.
+2024-06-11 20:43:32,726 - INFO - Login successful.
+2024-06-11 20:45:34,861 - INFO - Login successful.
+2024-06-11 20:48:53,382 - INFO - Login successful.
+2024-06-11 20:51:18,729 - INFO - Login successful.
+2024-06-11 20:52:12,286 - ERROR - Error decrypting data: 
+2024-06-11 20:52:12,287 - ERROR - Error decrypting data: 
+2024-06-11 20:52:12,287 - ERROR - Error decrypting data: 
+2024-06-11 20:54:27,838 - INFO - Login successful.
+2024-06-11 20:55:04,579 - ERROR - Error decrypting data: 
+2024-06-11 20:55:04,580 - ERROR - Error decrypting data: 
+2024-06-11 20:55:04,580 - ERROR - Error decrypting data: 
+2024-06-11 20:56:33,339 - INFO - Login successful.
+2024-06-11 20:56:40,863 - ERROR - Error decrypting data: 
+2024-06-11 20:56:40,863 - ERROR - Error decrypting data: 
+2024-06-11 20:56:40,864 - ERROR - Error decrypting data: 
+2024-06-11 20:57:52,282 - INFO - Login successful.
+2024-06-11 21:02:24,458 - INFO - Login successful.
+2024-06-11 21:27:10,698 - INFO - Login successful.
+2024-06-11 21:28:12,410 - ERROR - Error decrypting data: 
+2024-06-11 21:28:16,806 - ERROR - Error decrypting data: 
+2024-06-11 21:28:35,124 - ERROR - Error decrypting data: 
+2024-06-11 21:28:42,757 - ERROR - Error decrypting data: 
+2024-06-11 21:28:48,058 - ERROR - Error decrypting data: 
+2024-06-11 21:43:20,348 - INFO - Login successful.
+2024-06-11 21:47:42,932 - INFO - Login successful.
+2024-06-11 21:58:55,168 - INFO - Login successful.
+2024-06-11 21:59:48,200 - INFO - Login successful.
+2024-06-11 22:05:17,883 - INFO - Login successful.
+2024-06-11 22:08:25,118 - INFO - Login successful.
+2024-06-11 22:08:39,627 - INFO - Failed login attempt 1 for username: super_admin
+2024-06-11 22:09:26,881 - INFO - Login successful.
+2024-06-11 22:11:17,151 - INFO - Login successful.
+2024-06-11 22:25:28,459 - INFO - Login successful.
+2024-06-11 22:39:41,000 - INFO - Login successful.
+2024-06-11 22:41:46,234 - INFO - Login successful.
+2024-06-11 23:00:40,504 - INFO - Login successful.
+2024-06-11 23:02:39,829 - INFO - Login successful.
+2024-06-11 23:03:44,171 - INFO - Login successful.
+2024-06-11 23:07:17,545 - INFO - Login successful.
+2024-06-11 23:11:59,728 - INFO - Login successful.
+2024-06-11 23:12:44,263 - INFO - Login successful.
+2024-06-11 23:13:01,777 - INFO - Login successful.
+2024-06-11 23:15:14,387 - INFO - Failed login attempt 1 for username: ss
+2024-06-11 23:15:50,759 - INFO - Login successful.
