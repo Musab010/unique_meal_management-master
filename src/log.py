@@ -98,7 +98,7 @@ def decrypt_log_file():
             ]
             logs.append(decrypted_row)
         else:
-            print(f"Onverwachte rijlengte: {len(row)}. Rij: {row}")
+            print(f"Unexpected RowLength: {len(row)}. Row: {row}")
     
     return logs
 

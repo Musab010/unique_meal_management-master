@@ -1,39 +1,39 @@
 from datetime import datetime
 from encrypt_decrypt import encrypt_data, decrypt_data
 from log import log_activity, log_suspicious_activity
-from utils import hash_password  # Gebruik de hash_password-functie vanuit utils
+from utils import hash_password  # Use the hash_password function from utils
 import sqlite3
 from sqlite3 import Error
 import logging
 import re
 
-# Functies voor validatie
+# Validation functions
 def is_valid_username(username):
-    """Controleer of de gebruikersnaam voldoet aan de vereiste regels."""
+    """Check if the username meets the required rules."""
     if len(username) < 8 or len(username) > 10:
-        print("De gebruikersnaam moet tussen 8 en 10 tekens lang zijn.")
+        print("The username must be between 8 and 10 characters long.")
         return False
     if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_'.]*$", username):
-        print("De gebruikersnaam moet beginnen met een letter of underscore (_) en mag alleen letters, cijfers, underscores (_), apostrof (') of punten (.) bevatten.")
+        print("The username must start with a letter or underscore (_) and can only contain letters, digits, underscores (_), apostrophes (') or dots (.)")
         return False
     return True
 
 def is_valid_password(password):
-    """Controleer of het wachtwoord voldoet aan de vereiste regels."""
+    """Check if the password meets the required rules."""
     if len(password) < 12 or len(password) > 30:
-        print("Het wachtwoord moet tussen 12 en 30 tekens lang zijn.")
+        print("The password must be between 12 and 30 characters long.")
         return False
-    if not re.search(r"[a-z]", password):  # minstens één kleine letter
-        print("Het wachtwoord moet minstens één kleine letter bevatten.")
+    if not re.search(r"[a-z]", password):  # at least one lowercase letter
+        print("The password must contain at least one lowercase letter.")
         return False
-    if not re.search(r"[A-Z]", password):  # minstens één hoofdletter
-        print("Het wachtwoord moet minstens één hoofdletter bevatten.")
+    if not re.search(r"[A-Z]", password):  # at least one uppercase letter
+        print("The password must contain at least one uppercase letter.")
         return False
-    if not re.search(r"\d", password):  # minstens één cijfer
-        print("Het wachtwoord moet minstens één cijfer bevatten.")
+    if not re.search(r"\d", password):  # at least one digit
+        print("The password must contain at least one digit.")
         return False
-    if not re.search(r"[~!@#$%&_\-+=`|\(){}[\]:;'<>,.?/]", password):  # minstens één speciaal teken
-        print("Het wachtwoord moet minstens één speciaal teken bevatten.")
+    if not re.search(r"[~!@#$%&_\-+=`|\(){}[\]:;'<>,.?/]", password):  # at least one special character
+        print("The password must contain at least one special character.")
         return False
     return True
 
@@ -41,28 +41,28 @@ def validate_login(conn, username, password):
     try:
         cursor = conn.cursor()
         
-        # Haal alle gebruikers op en ontsleutel de gebruikersnamen
+        # Fetch all users and decrypt usernames
         cursor.execute("SELECT id, username, password, role FROM users")
         users = cursor.fetchall()
         
         for user in users:
-            decrypted_username = decrypt_data(user[1])  # Ontsleutel de gebruikersnaam
+            decrypted_username = decrypt_data(user[1])  # Decrypt username
             
             if decrypted_username == username:
-                # Vergelijk gehasht wachtwoord
+                # Compare hashed password
                 hashed_password = hash_password(password)
                 
                 if user[2] == hashed_password:
-                    return user[0], user[3]  # retourneer user_id en role
+                    return user[0], user[3]  # return user_id and role
         
-        return None  # retourneer None als de inloggegevens ongeldig zijn
+        return None  # return None if login credentials are invalid
     except Exception as e:
-        logging.error(f"Fout bij inloggen: {e}")
+        logging.error(f"Error during login: {e}")
         return None
 
-# Voeg logging toe voor gebruikersbeheer
+# Add logging for user management
 def add_user(conn, username, password, role, first_name, last_name):
-    from database import insert_user  # Importeer alleen binnen de functie
+    from database import insert_user  # Import only within the function
     user_id = insert_user(conn, username, password, role, first_name, last_name)
     if user_id:
         log_activity(username, "User added", f"Role: {role}, Name: {first_name} {last_name}")
@@ -70,14 +70,14 @@ def add_user(conn, username, password, role, first_name, last_name):
         log_suspicious_activity(username, "Failed to add user", f"Role: {role}, Name: {first_name} {last_name}")
 
 def delete_user(conn, user_id):
-    from database import remove_user  # Importeer alleen binnen de functie
+    from database import remove_user  # Import only within the function
     if remove_user(conn, user_id):
         log_activity("system", "User deleted", f"User ID: {user_id}")
     else:
         log_suspicious_activity("system", "Failed to delete user", f"User ID: {user_id}")
 
 def username_exists(conn, username):
-    """Controleer of een gegeven gebruikersnaam al bestaat in de database."""
+    """Check if a given username already exists in the database."""
     try:
         sql = "SELECT username FROM users"
         cur = conn.cursor()
@@ -94,34 +94,34 @@ def username_exists(conn, username):
         return False
 
 def add_user_prompt(conn, default_role=None):
-    """Prompt de gebruiker om een nieuwe gebruiker toe te voegen met een vastgestelde rol."""
+    """Prompt the user to add a new user with a set role."""
     while True:
-        username = input("Gebruikersnaam: ")
+        username = input("Username: ")
         if not is_valid_username(username):
-            print("Ongeldige gebruikersnaam. Zorg ervoor dat de gebruikersnaam voldoet aan de vereisten.")
+            print("Invalid username. Ensure the username meets the requirements.")
             continue
 
-        # Check of de gebruikersnaam al bestaat
+        # Check if the username already exists
         if username_exists(conn, username):
-            print("Deze gebruikersnaam bestaat al. Kies een andere gebruikersnaam.")
+            print("This username already exists. Choose a different username.")
             continue
         break
 
     while True:
-        password = input("Wachtwoord: ")
+        password = input("Password: ")
         if not is_valid_password(password):
-            print("Ongeldig wachtwoord. Zorg ervoor dat het wachtwoord voldoet aan de vereisten.")
+            print("Invalid password. Ensure the password meets the requirements.")
             continue
         break
 
-    first_name = input("Voornaam: ")
-    last_name = input("Achternaam: ")
+    first_name = input("First Name: ")
+    last_name = input("Last Name: ")
 
-    # Als default_role niet is opgegeven, vraag dan de gebruiker om een rol in te voeren
-    role = default_role if default_role else input("Rol: ")
+    # If default_role is not specified, ask the user to enter a role
+    role = default_role if default_role else input("Role: ")
 
-    encrypted_username = encrypt_data(username)  # Encrypt de gebruikersnaam voor opslag
-    hashed_password = hash_password(password)    # Hash het wachtwoord voor opslag
+    encrypted_username = encrypt_data(username)  # Encrypt the username for storage
+    hashed_password = hash_password(password)    # Hash the password for storage
     encrypted_first_name = encrypt_data(first_name)
     encrypted_last_name = encrypt_data(last_name)
 
@@ -132,48 +132,48 @@ def add_user_prompt(conn, default_role=None):
         cur.execute(sql, (encrypted_username, hashed_password, role, encrypted_first_name, encrypted_last_name, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         conn.commit()
         log_activity(username, "User added via prompt", f"Role: {role}, Name: {first_name} {last_name}")
-        print(f"Gebruiker {username} succesvol toegevoegd.")
+        print(f"User {username} successfully added.")
     except Error as e:
         logging.error(f"Error adding user: {e}")
         log_suspicious_activity(username, "Failed to add user via prompt", f"Role: {role}, Name: {first_name} {last_name}")
 
 def add_system_admin_prompt(conn):
-    """Prompt de gebruiker om een nieuwe systeembeheerder toe te voegen."""
-    print("Voeg nieuwe systeembeheerder toe.")
-    add_user_prompt(conn, default_role='system_admin')  # Gebruik 'system_admin' als vaste rol
+    """Prompt the user to add a new system admin."""
+    print("Add new system admin.")
+    add_user_prompt(conn, default_role='system_admin')  # Use 'system_admin' as the default role
 
 def add_consultant_prompt(conn):
-    """Prompt de gebruiker om een nieuwe consultant toe te voegen."""
-    print("Voeg nieuwe consultant toe.")
-    add_user_prompt(conn, default_role='consultant')  # Gebruik 'consultant' als vaste rol
+    """Prompt the user to add a new consultant."""
+    print("Add new consultant.")
+    add_user_prompt(conn, default_role='consultant')  # Use 'consultant' as the default role
 
 def update_password(conn, user_id):
-    """Update het wachtwoord van de huidige gebruiker."""
+    """Update the password of the current user."""
     while True:
-        new_password = input("Voer uw nieuwe wachtwoord in: ")
+        new_password = input("Enter your new password: ")
         if is_valid_password(new_password):
             break
 
     hashed_password = hash_password(new_password)
 
     try:
-        # Haal de gebruikersnaam op van de huidige gebruiker
+        # Retrieve the username of the current user
         sql_get_username = "SELECT username FROM users WHERE id=?"
         cur = conn.cursor()
         cur.execute(sql_get_username, (user_id,))
         row = cur.fetchone()
 
         if row:
-            username = decrypt_data(row[0])  # Ontsleutel de gebruikersnaam
+            username = decrypt_data(row[0])  # Decrypt the username
 
-            # Update het wachtwoord voor de gevonden gebruiker
+            # Update the password for the found user
             sql_update = "UPDATE users SET password=? WHERE id=?"
             cur.execute(sql_update, (hashed_password, user_id))
             conn.commit()
             log_activity(username, "Password updated", "User updated their password")
-            print(f"Wachtwoord voor gebruiker {username} succesvol bijgewerkt.")
+            print(f"Password for user {username} successfully updated.")
         else:
-            print("Gebruiker niet gevonden.")
+            print("User not found.")
             logging.error("Failed to find user for password update.")
 
     except Error as e:
@@ -181,7 +181,7 @@ def update_password(conn, user_id):
         log_suspicious_activity("system", "Failed to update password", f"Attempted to update password for user ID {user_id} with error: {e}")
 
 def list_users(conn):
-    """Geef een lijst van alle gebruikers en hun rollen."""
+    """Display a list of all users and their roles."""
     try:
         sql = "SELECT username, role FROM users"
         cur = conn.cursor()
@@ -190,36 +190,36 @@ def list_users(conn):
 
         for row in rows:
             try:
-                decrypted_username = decrypt_data(row[0])  # Ontsleutel de gebruikersnaam
-                print(f"Gebruikersnaam: {decrypted_username}, Rol: {row[1]}")
+                decrypted_username = decrypt_data(row[0])  # Decrypt the username
+                print(f"Username: {decrypted_username}, Role: {row[1]}")
             except Exception as e:
                 logging.error(f"Error decrypting data: {row[0]}. Exception: {e}")
-                print(f"Gebruikersnaam: [gehashed], Rol: {row[1]}")
+                print(f"Username: [hashed], Role: {row[1]}")
     except Error as e:
         logging.error(f"Error listing users: {e}")
 
 def update_user_prompt(conn):
-    """Prompt de gebruiker om een bestaande gebruiker bij te werken."""
+    """Prompt the user to update an existing user."""
     while True:
-        username = input("Voer de huidige gebruikersnaam in van de gebruiker die u wilt bijwerken: ")
+        username = input("Enter the current username of the user you want to update: ")
         if is_valid_username(username):
             break
 
     while True:
-        new_username = input("Nieuwe gebruikersnaam: ")
+        new_username = input("New Username: ")
         if not is_valid_username(new_username):
-            print("Ongeldige nieuwe gebruikersnaam. Zorg ervoor dat de gebruikersnaam voldoet aan de vereisten.")
+            print("Invalid new username. Ensure the username meets the requirements.")
             continue
         if username_exists(conn, new_username):
-            print("Deze nieuwe gebruikersnaam bestaat al. Kies een andere gebruikersnaam.")
+            print("This new username already exists. Choose a different username.")
             continue
         break
 
-    first_name = input("Nieuwe voornaam: ")
-    last_name = input("Nieuwe achternaam: ")
+    first_name = input("New First Name: ")
+    last_name = input("New Last Name: ")
 
     try:
-        # Haal alle gebruikers op en decrypt de gebruikersnamen om de juiste gebruiker te vinden
+        # Fetch all users and decrypt usernames to find the correct user
         sql_fetch_all = "SELECT id, username FROM users"
         cur = conn.cursor()
         cur.execute(sql_fetch_all)
@@ -237,30 +237,30 @@ def update_user_prompt(conn):
                 break
 
         if user_id:
-            # Update de gebruiker op basis van user_id
+            # Update the user based on user_id
             sql_update = "UPDATE users SET username=?, first_name=?, last_name=? WHERE id=?"
             cur.execute(sql_update, (encrypted_new_username, first_name, last_name, user_id))
             conn.commit()
 
             log_activity(username, "User updated", f"Username changed to {new_username}, Name updated to {first_name} {last_name}")
-            print(f"Gebruiker {username} succesvol bijgewerkt naar {new_username}.")
+            print(f"User {username} successfully updated to {new_username}.")
         else:
-            print(f"Gebruiker {username} niet gevonden.")
+            print(f"User {username} not found.")
             log_suspicious_activity(username, "Failed to update user", f"Attempted to update non-existent user {username}")
     except Error as e:
         logging.error(f"Error updating user: {e}")
         log_suspicious_activity(username, "Failed to update user", f"Attempted to update {username} with error: {e}")
 
 def delete_user_prompt(conn):
-    """Prompt de gebruiker om een bestaande gebruiker te verwijderen."""
+    """Prompt the user to delete an existing user."""
     while True:
-        username = input("Voer de gebruikersnaam in van de gebruiker die u wilt verwijderen: ")
+        username = input("Enter the username of the user you want to delete: ")
         if is_valid_username(username):
             break
     encrypted_username = None
 
     try:
-        # Haal alle gebruikers op en decrypt deze om te vinden wie verwijderd moet worden
+        # Fetch all users and decrypt them to find who to delete
         sql = "SELECT username FROM users"
         cur = conn.cursor()
         cur.execute(sql)
@@ -277,29 +277,29 @@ def delete_user_prompt(conn):
             cur.execute(sql_delete, (encrypted_username,))
             conn.commit()
             log_activity(username, "User deleted", f"User {username} was deleted")
-            print(f"Gebruiker {username} succesvol verwijderd.")
+            print(f"User {username} successfully deleted.")
         else:
-            print(f"Gebruiker {username} niet gevonden.")
+            print(f"User {username} not found.")
     except Error as e:
         logging.error(f"Error deleting user: {e}")
         log_suspicious_activity(username, "Failed to delete user", f"Attempted to delete {username}")
 
 def reset_user_password(conn):
-    """Reset het wachtwoord van een bestaande gebruiker."""
+    """Reset the password of an existing user."""
     while True:
-        username = input("Voer de gebruikersnaam in van de gebruiker waarvan u het wachtwoord wilt resetten: ")
+        username = input("Enter the username of the user whose password you want to reset: ")
         if is_valid_username(username):
             break
 
     while True:
-        new_password = input("Voer het nieuwe wachtwoord in: ")
+        new_password = input("Enter the new password: ")
         if is_valid_password(new_password):
             break
     
     hashed_password = hash_password(new_password)
 
     try:
-        # Haal alle gebruikers op en decrypt de gebruikersnamen om de juiste gebruiker te vinden
+        # Fetch all users and decrypt usernames to find the correct user
         sql_fetch_all = "SELECT id, username FROM users"
         cur = conn.cursor()
         cur.execute(sql_fetch_all)
@@ -316,41 +316,41 @@ def reset_user_password(conn):
                 break
 
         if user_id:
-            # Reset het wachtwoord voor de gevonden gebruiker
+            # Reset the password for the found user
             sql_update = "UPDATE users SET password=? WHERE id=?"
             cur.execute(sql_update, (hashed_password, user_id))
             conn.commit()
             log_activity(username, "Password reset", f"Password for {username} was reset")
-            print(f"Wachtwoord voor gebruiker {username} succesvol gereset.")
+            print(f"Password for user {username} successfully reset.")
         else:
-            print(f"Gebruiker {username} niet gevonden.")
+            print(f"User {username} not found.")
             log_suspicious_activity(username, "Failed to reset password", f"Attempted to reset password for non-existent user {username}")
     except Error as e:
         logging.error(f"Error resetting password: {e}")
         log_suspicious_activity(username, "Failed to reset password", f"Attempted to reset password for {username} with error: {e}")
 
 def update_admin_prompt(conn):
-    """Prompt de gebruiker om een systeembeheerder bij te werken."""
+    """Prompt the user to update a system admin."""
     while True:
-        username = input("Voer de huidige gebruikersnaam in van de systeembeheerder die u wilt bijwerken: ")
+        username = input("Enter the current username of the system admin you want to update: ")
         if is_valid_username(username):
             break
 
-    first_name = input("Nieuwe voornaam: ")
-    last_name = input("Nieuwe achternaam: ")
+    first_name = input("New First Name: ")
+    last_name = input("New Last Name: ")
 
     while True:
-        new_username = input("Nieuwe gebruikersnaam: ")
+        new_username = input("New Username: ")
         if not is_valid_username(new_username):
-            print("Ongeldige nieuwe gebruikersnaam. Zorg ervoor dat de gebruikersnaam voldoet aan de vereisten.")
+            print("Invalid new username. Ensure the username meets the requirements.")
             continue
         if username_exists(conn, new_username):
-            print("Deze nieuwe gebruikersnaam bestaat al. Kies een andere gebruikersnaam.")
+            print("This new username already exists. Choose a different username.")
             continue
         break
 
     try:
-        # Haal alle gebruikers op en decrypt de gebruikersnamen om de juiste gebruiker te vinden
+        # Fetch all users and decrypt usernames to find the correct user
         sql_fetch_all = "SELECT id, username, role FROM users"
         cur = conn.cursor()
         cur.execute(sql_fetch_all)
@@ -370,33 +370,33 @@ def update_admin_prompt(conn):
 
         if user_id:
             if role != 'system_admin':
-                print("Deze functie is alleen beschikbaar voor systeembeheerder accounts.")
+                print("This function is only available for system admin accounts.")
                 return
 
-            # Update de systeembeheerder op basis van user_id
+            # Update the system admin based on user_id
             sql_update = "UPDATE users SET username=?, first_name=?, last_name=? WHERE id=?"
             cur.execute(sql_update, (encrypted_new_username, encrypt_data(first_name), encrypt_data(last_name), user_id))
             conn.commit()
 
             log_activity(username, "System Admin updated", f"Username changed to {new_username}, Name updated to {first_name} {last_name}")
-            print(f"Systeembeheerder {username} succesvol bijgewerkt naar {new_username}.")
+            print(f"System admin {username} successfully updated to {new_username}.")
         else:
-            print(f"Systeembeheerder {username} niet gevonden.")
+            print(f"System admin {username} not found.")
             log_suspicious_activity(username, "Failed to update system admin", f"Attempted to update non-existent system admin {username}")
     except Error as e:
         logging.error(f"Error updating system admin: {e}")
         log_suspicious_activity(username, "Failed to update system admin", f"Attempted to update system admin {username} with error: {e}")
 
 def delete_admin_prompt(conn):
-    """Prompt de gebruiker om een systeembeheerder account te verwijderen."""
+    """Prompt the user to delete a system admin account."""
     while True:
-        username = input("Voer de gebruikersnaam in van de systeembeheerder die u wilt verwijderen: ")
+        username = input("Enter the username of the system admin you want to delete: ")
         if is_valid_username(username):
             break
     encrypted_username = None
 
     try:
-        # Haal alle gebruikers op en decrypt deze om te vinden wie verwijderd moet worden
+        # Fetch all users and decrypt them to find who to delete
         sql = "SELECT id, username, role FROM users"
         cur = conn.cursor()
         cur.execute(sql)
@@ -413,29 +413,29 @@ def delete_admin_prompt(conn):
 
         if user_id:
             if role != 'system_admin':
-                print("Deze functie is alleen beschikbaar voor systeembeheerder accounts.")
+                print("This function is only available for system admin accounts.")
                 return
 
             sql_delete = "DELETE FROM users WHERE id=?"
             cur.execute(sql_delete, (user_id,))
             conn.commit()
             log_activity(username, "System Admin deleted", f"System Admin {username} was deleted")
-            print(f"Systeembeheerder {username} succesvol verwijderd.")
+            print(f"System admin {username} successfully deleted.")
         else:
-            print(f"Systeembeheerder {username} niet gevonden.")
+            print(f"System admin {username} not found.")
     except Error as e:
         logging.error(f"Error deleting system admin: {e}")
         log_suspicious_activity(username, "Failed to delete system admin", f"Attempted to delete {username}")
 
 def reset_admin_password_prompt(conn):
-    """Prompt de superadmin om het wachtwoord van een systeembeheerder te resetten."""
+    """Prompt the superadmin to reset the password of a system admin."""
     while True:
-        username = input("Voer de gebruikersnaam in van de systeembeheerder waarvan u het wachtwoord wilt resetten: ")
+        username = input("Enter the username of the system admin whose password you want to reset: ")
         if is_valid_username(username):
             break
 
     try:
-        # Haal alle systeembeheerders op en decrypt de gebruikersnamen om de juiste te vinden
+        # Fetch all system admins and decrypt usernames to find the correct one
         sql_fetch_all = "SELECT id, username, role FROM users WHERE role='system_admin'"
         cur = conn.cursor()
         cur.execute(sql_fetch_all)
@@ -450,20 +450,20 @@ def reset_admin_password_prompt(conn):
 
         if user_id:
             while True:
-                new_password = input("Voer het nieuwe wachtwoord in: ")
+                new_password = input("Enter the new password: ")
                 if is_valid_password(new_password):
                     break
 
             hashed_password = hash_password(new_password)
 
-            # Reset het wachtwoord voor de gevonden systeembeheerder
+            # Reset the password for the found system admin
             sql_update = "UPDATE users SET password=? WHERE id=?"
             cur.execute(sql_update, (hashed_password, user_id))
             conn.commit()
             log_activity(username, "System Admin password reset", f"Password for system admin {username} was reset")
-            print(f"Wachtwoord voor systeembeheerder {username} succesvol gereset.")
+            print(f"Password for system admin {username} successfully reset.")
         else:
-            print(f"Systeembeheerder {username} niet gevonden.")
+            print(f"System admin {username} not found.")
             log_suspicious_activity(username, "Failed to reset password for system admin", f"Attempted to reset password for non-existent system admin {username}")
     except Error as e:
         logging.error(f"Error resetting password for system admin: {e}")

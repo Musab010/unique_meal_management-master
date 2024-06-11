@@ -10,7 +10,7 @@ def create_connection(db_file):
     conn = None
     try:
         conn = sqlite3.connect(db_file)
-        print(f"SQLite verbinding is succesvol: {sqlite3.version}")
+        print(f"SQLite connection is succesful: {sqlite3.version}")
     except Error as e:
         print(e)
     return conn
@@ -68,7 +68,7 @@ def add_super_admin(conn):
         cur = conn.cursor()
         cur.execute("SELECT * FROM users WHERE role='super_admin'")
         if cur.fetchone():
-            print("Super admin bestaat al.")
+            # print("Super admin already Exists.")
             return
 
         # Voeg super_admin toe als deze nog niet bestaat
@@ -77,7 +77,7 @@ def add_super_admin(conn):
                  VALUES (?, ?, 'super_admin', 'Super', 'Admin', ?)"""
         cur.execute(sql, (encrypted_username, hashed_password, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         conn.commit()
-        print("Super admin toegevoegd.")
+        print("Super admin added.")
     except Error as e:
         print(e)
 

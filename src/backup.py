@@ -22,13 +22,13 @@ def backup_database_and_logs(database_path):
             if os.path.exists(log_file):
                 backup_zip.write(log_file, os.path.basename(log_file))
             else:
-                print(f"Logbestand {log_file} niet gevonden, overslaan.")
+                print(f"Logfile {log_file} could not be found, skipping.")
 
-    print(f"Back-up succesvol gemaakt: {backup_path}")
+    print(f"Back-up succesfully created: {backup_path}")
 
 def restore_database_from_backup(database_path):
     backup_dir = "backups"
-    backup_file = input("Voer de naam van het back-upbestand in (in de 'backups' map): ")
+    backup_file = input("Enter the name of the backup-file in (in the 'backups' directory): ")
     backup_path = os.path.join(backup_dir, backup_file)
     
     if os.path.exists(backup_path):
@@ -47,6 +47,6 @@ def restore_database_from_backup(database_path):
                     extracted_file_path = os.path.join("data", os.path.basename(file_name))
                     shutil.move(extracted_file_path, os.path.join("data", file_name))
         
-        print("Back-up succesvol hersteld.")
+        print("Back-up succesfully recovered.")
     else:
-        print("Back-upbestand niet gevonden.")
+        print("Backup file could not be found.")

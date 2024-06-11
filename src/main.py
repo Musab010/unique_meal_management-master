@@ -5,52 +5,52 @@ from user import validate_login, add_user_prompt, add_system_admin_prompt, add_c
 from member import add_member_prompt, search_member_prompt, update_member_prompt, delete_member_prompt
 from log import log_activity, log_suspicious_activity, get_suspicious_logs, decrypt_log_file
 from database import create_connection, create_tables, add_super_admin
-from backup import backup_database_and_logs,restore_database_from_backup
+from backup import backup_database_and_logs, restore_database_from_backup
 
-# Logging configuratie
+# Logging configuration
 logging.basicConfig(filename='data/system.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def main_menu(role):
     print("\n===================================")
-    print("Welkom bij Unique Meal Management System")
+    print("Welcome to Unique Meal Management System")
     print("===================================")
     if role == 'super_admin':
-        print("1. Voeg systeembeheerder toe (A/a)")
-        print("2. Voeg consultant toe (C/c)")
-        print("3. Update systeembeheerder (U/u)")
-        print("4. Verwijder systeembeheerder (D/d)")
-        print("5. Reset wachtwoord van systeembeheerder (R/r)")
+        print("1. Add system admin (A/a)")
+        print("2. Add consultant (C/c)")
+        print("3. Update system admin (U/u)")
+        print("4. Delete system admin (D/d)")
+        print("5. Reset system admin password (R/r)")
     if role in ['super_admin', 'system_admin']:
-        print("6. Bekijk gebruikers en rollen (V/v)")
-        print("7. Wijzig consultant account (U/u)")
-        print("8. Verwijder consultant account (D/d)")
-        print("9. Reset consultant wachtwoord (R/r)")
-        print("10. Maak back-up (B/b)")
-        print("11. Herstel back-up (H/h)")
-        print("12. Bekijk logs (L/l)")
-        print("13. Registreer nieuw lid (N/n)")
-        print("14. Zoek lid (S/s)")
-        print("15. Update lid (U/u)")
-        print("16. Verwijder lid (D/d)")
+        print("6. View users and roles (V/v)")
+        print("7. Update consultant account (U/u)")
+        print("8. Delete consultant account (D/d)")
+        print("9. Reset consultant password (R/r)")
+        print("10. Create backup (B/b)")
+        print("11. Restore backup (H/h)")
+        print("12. View logs (L/l)")
+        print("13. Register new member (N/n)")
+        print("14. Search member (S/s)")
+        print("15. Update member (U/u)")
+        print("16. Delete member (D/d)")
     if role == 'consultant':
-        print("13. Registreer nieuw lid (N/n)")
-        print("14. Zoek lid (S/s)")
-        print("15. Update lid (U/u)")
-        print("16. Verwijder lid (D/d)")
+        print("13. Register new member (N/n)")
+        print("14. Search member (S/s)")
+        print("15. Update member (U/u)")
+        print("16. Delete member (D/d)")
     if role == 'member':
-        print("Profielbeheer (alleen indien toegestaan)")
-    print("17. Update wachtwoord (P/p)")
-    print("18. Afsluiten (Q/q)")
+        print("Profile management (if allowed)")
+    print("17. Update password (P/p)")
+    print("18. Exit (Q/q)")
     print("===================================")
-    choice = input("Voer uw keuze in: ").strip().lower()
+    choice = input("Enter your choice: ").strip().lower()
     return choice
 
 
 def login_prompt(conn, max_attempts=3):
     attempts = 0
     while attempts < max_attempts:
-        username = input("Gebruikersnaam: ")
-        password = input("Wachtwoord: ")
+        username = input("Username: ")
+        password = input("Password: ")
         
         result = validate_login(conn, username, password)
         
@@ -62,17 +62,17 @@ def login_prompt(conn, max_attempts=3):
         else:
             log_suspicious_activity(username, "Failed login attempt", f"Attempt {attempts + 1}")
             logging.info(f"Failed login attempt {attempts + 1} for username: {username}")
-            print("Ongeldige inloggegevens. Probeer opnieuw of sluit af.")
-            opnieuw_proberen = input("Wilt u opnieuw proberen? (j/n): ").lower()
-            if opnieuw_proberen == 'n':
+            print("Invalid login credentials. Try again or exit.")
+            retry = input("Do you want to try again? (y/n): ").lower()
+            if retry == 'n':
                 log_activity(username, "User chose to exit after failed login attempts")
-                print("Afsluiten...")
+                print("Exiting...")
                 exit()
         
         attempts += 1
         if attempts >= max_attempts:
             log_suspicious_activity(username, "Too many failed login attempts", f"Total attempts: {max_attempts}")
-            print("Te veel mislukte inlogpogingen. Afsluiten...")
+            print("Too many failed login attempts. Exiting...")
             exit()
 
 
@@ -90,7 +90,7 @@ def main():
     if role in ['super_admin', 'system_admin']:
         suspicious_logs = get_suspicious_logs()
         if suspicious_logs:
-            print("Er zijn ongelezen verdachte activiteiten!")
+            print("There are unread suspicious activities!")
             for log_entry in suspicious_logs:
                 print(f"{log_entry[0]} - {log_entry[1]} {log_entry[2]} - {log_entry[3]}: {log_entry[4]} - {log_entry[5]}")
 
@@ -121,23 +121,23 @@ def main():
         elif choice in ['l', '12'] and role in ['super_admin', 'system_admin']:
             logs = decrypt_log_file()
             for log_entry in logs:
-                print(f"{log_entry[0]} - {log_entry[1]} {log_entry[2]} - {log_entry[3]}: {log_entry[4]} - {log_entry[5]} - Verdacht: {log_entry[6]}")
+                print(f"{log_entry[0]} - {log_entry[1]} {log_entry[2]} - {log_entry[3]}: {log_entry[4]} - {log_entry[5]} - Suspicious: {log_entry[6]}")
         elif choice in ['n', '13'] and role in ['super_admin', 'system_admin', 'consultant']:
             add_member_prompt(conn)
         elif choice in ['s', '14'] and role in ['super_admin', 'system_admin', 'consultant']:
             search_member_prompt(conn)
         elif choice in ['u', '15'] and role in ['super_admin', 'system_admin', 'consultant']:
-            member_id = input("Voer lidmaatschapsnummer in: ")
+            member_id = input("Enter membership number: ")
             update_member_prompt(conn, member_id)
         elif choice in ['d', '16'] and role in ['super_admin', 'system_admin']:
             delete_member_prompt(conn)
         elif choice in ['p', '17']:
             update_password(conn, user_id)
         elif choice in ['q', '18']:
-            print("Afsluiten...")
+            print("Exiting...")
             break
         else:
-            print("Ongeldige keuze. Probeer opnieuw.")
+            print("Invalid choice. Try again.")
 
     conn.close()
 

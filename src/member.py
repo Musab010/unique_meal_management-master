@@ -9,17 +9,17 @@ from database import create_connection
 from sqlite3 import Error
 
 CITIES = [
-    "Amsterdam", "Rotterdam", "Den Haag", "Utrecht", "Eindhoven",
+    "Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven",
     "Tilburg", "Groningen", "Almere", "Breda", "Nijmegen"
 ]
 
 def generate_membership_id():
     current_year = datetime.now().year
-    short_year = str(current_year)[-2:]  # Verkorte registratiejaar, bv. "23" voor 2023
-    random_digits = ''.join([str(random.randint(0, 9)) for _ in range(7)])  # 7 willekeurige cijfers
+    short_year = str(current_year)[-2:]  # Shortened registration year, e.g., "23" for 2023
+    random_digits = ''.join([str(random.randint(0, 9)) for _ in range(7)])  # 7 random digits
     base_id = short_year + random_digits
 
-    checksum = sum(int(digit) for digit in base_id) % 10  # Controlegetal berekenen
+    checksum = sum(int(digit) for digit in base_id) % 10  # Calculate checksum
     membership_id = base_id + str(checksum)
     return membership_id
 
@@ -32,7 +32,7 @@ def validate_phone(phone):
     return re.match(regex, phone) is not None
 
 def add_member(conn, first_name, last_name, age, gender, weight, address, email, phone, membership_id):
-    """Voeg een nieuw lid toe aan de database."""
+    """Add a new member to the database."""
     encrypted_first_name = encrypt_data(first_name)
     encrypted_last_name = encrypt_data(last_name)
     encrypted_age = encrypt_data(str(age))
@@ -50,65 +50,65 @@ def add_member(conn, first_name, last_name, age, gender, weight, address, email,
         cur.execute(sql, (encrypted_first_name, encrypted_last_name, encrypted_age, encrypted_gender, encrypted_weight, encrypted_address, encrypted_email, encrypted_phone, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), encrypted_membership_id))
         conn.commit()
         log_activity(membership_id, "Member added", f"Name: {first_name} {last_name}")
-        return cur.lastrowid  # Retourneer het ID van het toegevoegde lid
+        return cur.lastrowid  # Return the ID of the added member
     except Error as e:
         logging.error(f"Error adding member: {e}")
         log_suspicious_activity(membership_id, "Failed to add member", f"Attempted to add member {first_name} {last_name}")
         return None
 
 def add_member_prompt(conn):
-    first_name = input("Voornaam: ")
-    last_name = input("Achternaam: ")
+    first_name = input("First Name: ")
+    last_name = input("Last Name: ")
 
     while True:
-        age_input = input("Leeftijd: ")
+        age_input = input("Age: ")
         if age_input.isdigit() and 0 < int(age_input) <= 120:
             age = int(age_input)
             break
         else:
-            print("Ongeldige leeftijd. Voer een numerieke waarde in tussen 1 en 120.")
+            print("Invalid age. Enter a numeric value between 1 and 120.")
 
     while True:
-        gender = input("Geslacht (M voor male, F voor female): ").strip().upper()
+        gender = input("Gender (M for male, F for female): ").strip().upper()
         if gender in ["M", "F"]:
             break
         else:
-            print("Ongeldig geslacht. Voer 'M' voor male of 'F' voor female in.")
+            print("Invalid gender. Enter 'M' for male or 'F' for female.")
 
     while True:
-        weight_input = input("Gewicht (bijv. 72.5): ")
+        weight_input = input("Weight (e.g., 72.5): ")
         try:
             weight = float(weight_input)
             if weight > 0:
                 break
             else:
-                print("Gewicht moet groter zijn dan 0.")
+                print("Weight must be greater than 0.")
         except ValueError:
-            print("Ongeldig gewicht. Voer een numerieke waarde in.")
+            print("Invalid weight. Enter a numeric value.")
 
-    street = input("Straatnaam: ")
-    house_number = input("Huisnummer: ")
+    street = input("Street Name: ")
+    house_number = input("House Number: ")
     
     while True:
-        zip_code = input("Postcode (formaat DDDDXX): ")
+        zip_code = input("Postal Code (format DDDDXX): ")
         if re.match(r'^\d{4}[A-Z]{2}$', zip_code):
             break
-        print("Ongeldige postcode. Gebruik het formaat DDDDXX.")
+        print("Invalid postal code. Use the format DDDDXX.")
 
-    print("Kies een stad uit de volgende lijst:")
+    print("Choose a city from the following list:")
     for i, city in enumerate(CITIES, start=1):
         print(f"{i}. {city}")
     
     while True:
         try:
-            city_index = int(input("Voer het nummer van de stad in: "))
+            city_index = int(input("Enter the number of the city: "))
             if 1 <= city_index <= len(CITIES):
                 city = CITIES[city_index - 1]
                 break
             else:
-                print(f"Voer een nummer in tussen 1 en {len(CITIES)}.")
+                print(f"Enter a number between 1 and {len(CITIES)}.")
         except ValueError:
-            print("Ongeldige invoer. Voer een numerieke waarde in.")
+            print("Invalid input. Enter a numeric value.")
 
     address = f"{street} {house_number}, {zip_code} {city}"
 
@@ -116,21 +116,21 @@ def add_member_prompt(conn):
         email = input("Email: ")
         if validate_email(email):
             break
-        print("Ongeldig emailadres.")
+        print("Invalid email address.")
     
     while True:
-        phone_input = input("Telefoon (formaat: +31-6-XXXXXXXX): ")
+        phone_input = input("Phone (format: +31-6-XXXXXXXX): ")
         if validate_phone(phone_input):
             phone = phone_input
             break
-        print("Ongeldig telefoonnummer. Gebruik het formaat +31-6-XXXXXXXX.")
+        print("Invalid phone number. Use the format +31-6-XXXXXXXX.")
     
     membership_id = generate_membership_id()
     member_id = add_member(conn, first_name, last_name, age, gender, weight, address, email, phone, membership_id)
     if member_id:
-        print(f"Lid {first_name} {last_name} succesvol toegevoegd met lidnummer {membership_id}.")
+        print(f"Member {first_name} {last_name} successfully added with membership number {membership_id}.")
     else:
-        print("Lid toevoegen mislukt.")
+        print("Failed to add member.")
 
 def search_member(conn, search_key):
     cur = conn.cursor()
@@ -142,11 +142,11 @@ def search_member(conn, search_key):
     return rows
 
 def search_member_prompt(conn):
-    """Prompt de gebruiker om een lid te zoeken."""
-    search_term = input("Voer de voornaam, achternaam of lidnummer in om te zoeken: ").strip()
+    """Prompt the user to search for a member."""
+    search_term = input("Enter the first name, last name, or membership number to search: ").strip()
 
     try:
-        # Haal alle leden op
+        # Fetch all members
         sql_fetch_all = "SELECT first_name, last_name, membership_id, age, gender, weight, address, email, phone FROM members"
         cur = conn.cursor()
         cur.execute(sql_fetch_all)
@@ -154,20 +154,20 @@ def search_member_prompt(conn):
 
         found_members = []
 
-        # Ontsleutel en zoek in de relevante velden
+        # Decrypt and search in relevant fields
         for row in rows:
             try:
                 decrypted_first_name = decrypt_data(row[0])
                 decrypted_last_name = decrypt_data(row[1])
                 decrypted_membership_id = decrypt_data(row[2])
-                decrypted_age = decrypt_data(row[3])  # Correct ontsleutelen
+                decrypted_age = decrypt_data(row[3])  # Correctly decrypt
                 decrypted_gender = decrypt_data(row[4])
-                decrypted_weight = decrypt_data(row[5])  # Correct ontsleutelen
+                decrypted_weight = decrypt_data(row[5])  # Correctly decrypt
                 decrypted_address = decrypt_data(row[6])
                 decrypted_email = decrypt_data(row[7])
                 decrypted_phone = decrypt_data(row[8])
 
-                # Controleer of een van de velden overeenkomt met de zoekterm
+                # Check if any of the fields match the search term
                 if (search_term.lower() in decrypted_first_name.lower() or
                     search_term.lower() in decrypted_last_name.lower() or
                     search_term == decrypted_membership_id):
@@ -184,25 +184,24 @@ def search_member_prompt(conn):
                     })
             except Exception as e:
                 logging.error(f"Error decrypting data: {e}")
-                # Optionally, print a message if you want to notify about decryption issues
-                print(f"Fout bij het ontsleutelen van gegevens voor een lid: {e}")
+                print(f"Error decrypting data for a member: {e}")
 
-        # Resultaten weergeven
+        # Display results
         if found_members:
-            print("Gevonden leden:")
+            print("Found members:")
             for member in found_members:
-                print(f"Voornaam: {member['first_name']}, Achternaam: {member['last_name']}, Lidnummer: {member['membership_id']}, Leeftijd: {member['age']}, Geslacht: {member['gender']}, Gewicht: {member['weight']}, Adres: {member['address']}, Email: {member['email']}, Telefoon: {member['phone']}")
+                print(f"First Name: {member['first_name']}, Last Name: {member['last_name']}, Membership ID: {member['membership_id']}, Age: {member['age']}, Gender: {member['gender']}, Weight: {member['weight']}, Address: {member['address']}, Email: {member['email']}, Phone: {member['phone']}")
         else:
-            print("Geen leden gevonden die overeenkomen met de zoekterm.")
+            print("No members found matching the search term.")
     except Error as e:
         logging.error(f"Error searching member: {e}")
-        print("Er is een fout opgetreden bij het zoeken naar leden.")
+        print("An error occurred while searching for members.")
 
 def update_member(conn, membership_id):
-    """Update de informatie van een lid op basis van het lidmaatschapsnummer."""
-    print("Update informatie van lid.")
+    """Update member information based on membership ID."""
+    print("Update member information.")
 
-    # Eerst alle leden ophalen en decrypten
+    # Fetch all members and decrypt to find the correct member
     sql_fetch_all = "SELECT id, first_name, last_name, membership_id FROM members"
     cur = conn.cursor()
     cur.execute(sql_fetch_all)
@@ -210,7 +209,7 @@ def update_member(conn, membership_id):
 
     member_id = None
 
-    # Zoek het lid op basis van het lidmaatschapsnummer
+    # Find the member based on membership ID
     for row in rows:
         decrypted_membership_id = decrypt_data(row[3])
         if decrypted_membership_id == membership_id:
@@ -218,79 +217,79 @@ def update_member(conn, membership_id):
             break
 
     if not member_id:
-        print(f"Lid met lidmaatschapsnummer {membership_id} niet gevonden.")
+        print(f"Member with membership ID {membership_id} not found.")
         return
 
-    # Vraag om de nieuwe informatie
-    first_name = input("Nieuwe voornaam: ")
-    last_name = input("Nieuwe achternaam: ")
+    # Ask for new information
+    first_name = input("New First Name: ")
+    last_name = input("New Last Name: ")
 
     while True:
-        age_input = input("Nieuwe leeftijd: ")
+        age_input = input("New Age: ")
         if age_input.isdigit() and 0 < int(age_input) <= 120:
             age = int(age_input)
             break
         else:
-            print("Ongeldige leeftijd. Voer een numerieke waarde in tussen 1 en 120.")
+            print("Invalid age. Enter a numeric value between 1 and 120.")
 
     while True:
-        gender = input("Nieuw geslacht (M voor male, F voor female): ").strip().upper()
+        gender = input("New Gender (M for male, F for female): ").strip().upper()
         if gender in ["M", "F"]:
             break
         else:
-            print("Ongeldig geslacht. Voer 'M' voor male of 'F' voor female in.")
+            print("Invalid gender. Enter 'M' for male or 'F' for female.")
 
     while True:
-        weight_input = input("Nieuw gewicht (bijv. 72.5): ")
+        weight_input = input("New Weight (e.g., 72.5): ")
         try:
             weight = float(weight_input)
             if weight > 0:
                 break
             else:
-                print("Gewicht moet groter zijn dan 0.")
+                print("Weight must be greater than 0.")
         except ValueError:
-            print("Ongeldig gewicht. Voer een numerieke waarde in.")
+            print("Invalid weight. Enter a numeric value.")
 
-    street = input("Nieuwe straatnaam: ")
-    house_number = input("Nieuw huisnummer: ")
+    street = input("New Street Name: ")
+    house_number = input("New House Number: ")
 
     while True:
-        zip_code = input("Nieuwe postcode (formaat DDDDXX): ")
+        zip_code = input("New Postal Code (format DDDDXX): ")
         if re.match(r'^\d{4}[A-Z]{2}$', zip_code):
             break
-        print("Ongeldige postcode. Gebruik het formaat DDDDXX.")
+        print("Invalid postal code. Use the format DDDDXX.")
 
-    print("Kies een nieuwe stad uit de volgende lijst:")
+    print("Choose a new city from the following list:")
     for i, city in enumerate(CITIES, start=1):
         print(f"{i}. {city}")
 
     while True:
         try:
-            city_index = int(input("Voer het nummer van de nieuwe stad in: "))
+            city_index = int(input("Enter the number of the new city: "))
             if 1 <= city_index <= len(CITIES):
                 city = CITIES[city_index - 1]
                 break
             else:
-                print(f"Voer een nummer in tussen 1 en {len(CITIES)}.")
+                print(f"Enter a number between 1 and {len(CITIES)}.")
         except ValueError:
-            print("Ongeldige invoer. Voer een numerieke waarde in.")
+            print("Invalid input. Enter a numeric value.")
 
     address = f"{street} {house_number}, {zip_code} {city}"
 
     while True:
-        email = input("Nieuwe email: ")
+        email = input("New Email: ")
         if validate_email(email):
             break
-        print("Ongeldig emailadres.")
+        print("Invalid email address.")
 
     while True:
-        phone_input = input("Nieuwe telefoon (formaat: +31-6-XXXXXXXX): ")
+        phone_input = input("New Phone (format: +31-6-XXXXXXXX): ")
         if validate_phone(phone_input):
             phone = phone_input
             break
-        print("Ongeldig telefoonnummer. Gebruik het formaat +31-6-XXXXXXXX.")
+        print("Invalid phone number. Use the format +31-6-XXXXXXXX.")
 
-    # Update het lid in de database
+    # Update the member in the database
     sql_update = '''UPDATE members SET first_name=?, last_name=?, age=?, gender=?, weight=?, address=?, email=?, phone=? WHERE id=?'''
     cur.execute(sql_update, (
         encrypt_data(first_name), 
@@ -304,17 +303,17 @@ def update_member(conn, membership_id):
         member_id
     ))
     conn.commit()
-    print(f"Lid {first_name} {last_name} succesvol bijgewerkt.")
+    print(f"Member {first_name} {last_name} successfully updated.")
 
 def update_member_prompt(conn, member_id=None):
-    """Prompt de gebruiker om een lid bij te werken."""
+    """Prompt the user to update a member."""
     if member_id is None:
-        member_id = input("Voer het lidmaatschapsnummer in van het lid dat je wilt bijwerken: ")
+        member_id = input("Enter the membership ID of the member you want to update: ")
     update_member(conn, member_id)
 
 def delete_member(conn, member_id):
-    """Verwijder een lid uit de database op basis van het lidmaatschapsnummer."""
-    # Haal alle leden op en decrypt de lidmaatschapsnummers om het juiste lid te vinden
+    """Delete a member from the database based on membership ID."""
+    # Fetch all members and decrypt the membership IDs to find the correct member
     sql_fetch_all = "SELECT id, membership_id FROM members"
     cur = conn.cursor()
     cur.execute(sql_fetch_all)
@@ -332,15 +331,15 @@ def delete_member(conn, member_id):
         sql_delete = 'DELETE FROM members WHERE id = ?'
         cur.execute(sql_delete, (member_db_id,))
         conn.commit()
-        return cur.rowcount  # Geeft het aantal verwijderde rijen terug
+        return cur.rowcount  # Return the number of deleted rows
     else:
-        print(f"Lid met lidmaatschapsnummer {member_id} is niet gevonden.")
+        print(f"Member with membership ID {member_id} not found.")
         return 0
 
 def delete_member_prompt(conn):
-    """Prompt de gebruiker om een lid te verwijderen."""
-    member_id = input("Voer het lidmaatschapsnummer in van het lid dat je wilt verwijderen: ")
+    """Prompt the user to delete a member."""
+    member_id = input("Enter the membership ID of the member you want to delete: ")
     if delete_member(conn, member_id):
-        print(f"Lid met lidmaatschapsnummer {member_id} is succesvol verwijderd.")
+        print(f"Member with membership ID {member_id} successfully deleted.")
     else:
-        print(f"Lid met lidmaatschapsnummer {member_id} is niet gevonden.")
+        print(f"Member with membership ID {member_id} not found.")

@@ -27,4 +27,4 @@ with open("data/private_key.pem", "wb") as private_file:
 with open("data/public_key.pem", "wb") as public_file:
     public_file.write(public_key)
 
-print("Publieke en private sleutels zijn gegenereerd en opgeslagen in de data directory.")
+print("Public and Private keys are generated and saved in the data directory.")
